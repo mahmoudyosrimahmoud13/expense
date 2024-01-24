@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
-  NewTransaction(this.addTransaction);
+  const NewTransaction(this.addTransaction, {super.key});
   final Function addTransaction;
 
   @override
@@ -74,7 +74,7 @@ class _NewTransactionState extends State<NewTransaction> {
         ),
       ),
     );
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
   }
 
   void persentDtaePicker() {

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/Transaction.dart';
 
+// ignore: must_be_immutable
 class TransactionList extends StatelessWidget {
-  late Function _deletedTransactions;
+  TransactionList(this.transactions, this._deletedTransactions, {super.key});
+
+  final Function _deletedTransactions;
   List<Transaction> transactions;
-  TransactionList(this.transactions, this._deletedTransactions);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,7 +22,7 @@ class TransactionList extends StatelessWidget {
                     fit: BoxFit.contain,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 Text(
@@ -37,7 +39,7 @@ class TransactionList extends StatelessWidget {
                       radius: 30,
                       backgroundColor: Theme.of(context).dialogBackgroundColor,
                       child: Padding(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         child: FittedBox(
                           child: Text(
                             '\$ ${transactions[index].amount}',
@@ -56,11 +58,11 @@ class TransactionList extends StatelessWidget {
                         ? TextButton.icon(
                             onPressed: () =>
                                 _deletedTransactions(transactions[index].id),
-                            label: Text('Delete'),
-                            icon: Icon(Icons.delete_forever_rounded),
+                            label: const Text('Delete'),
+                            icon: const Icon(Icons.delete_forever_rounded),
                           )
                         : IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.delete_forever_rounded,
                               color: Colors.white,
                             ),
