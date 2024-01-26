@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 class NewTransaction extends StatefulWidget {
   const NewTransaction(this.addTransaction, {super.key});
   final Function addTransaction;
+  
 
   @override
   State<NewTransaction> createState() => _NewTransactionState();
@@ -13,6 +14,7 @@ class _NewTransactionState extends State<NewTransaction> {
   final titleController = TextEditingController();
   final amountController = TextEditingController();
   DateTime? selectedDate;
+  
   void _submitedData() {
     if (amountController.text.isEmpty) {
       return;

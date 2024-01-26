@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import './widgets/new_transaction.dart';
 import './models/Transaction.dart';
 import './widgets/transaction_list.dart';
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Expense',
-      theme: ThemeData(
+      theme: ThemeData().copyWith(
+        colorScheme: ColorScheme.fromSeed(seedColor: HexColor('#F2AFEF')),
         textTheme: TextTheme(
             titleLarge: GoogleFonts.tektur(
                 fontSize: 25,
@@ -82,21 +84,34 @@ class _MyHomePageState extends State<MyHomePage> {
   void _addNewTransaction(String title, double amount, DateTime date) {
     setState(() {
       _userTransactions.add(Transaction(
-          id: DateTime.now().toString(),
+          id: DateTime.now().second.toString(),
           title: title,
           amount: amount,
           date: date));
+      Navigator.pop(context);
     });
   }
 
-  void _deleteTransaction(String id) {
+  void _deleteTransaction(Transaction transaction) {
     setState(() {
-      _userTransactions.removeWhere((tx) => tx.id == id);
+      _userTransactions.remove(transaction);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text('${transaction.title} deleted'),
+          backgroundColor: Theme.of(context).primaryColorLight,
+          action: SnackBarAction(
+              label: 'Undo',
+              onPressed: () => setState(() {
+                    _userTransactions.add(transaction);
+                  }))),
+    );
   }
 
   void addButtomSheet(BuildContext context) {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (_) {
         return NewTransaction(_addNewTransaction);
@@ -110,6 +125,32 @@ class _MyHomePageState extends State<MyHomePage> {
     fontWeight: FontWeight.bold,
     fontSize: 12,
   );
+
+  Widget _buildLandScapeContent() {
+    return Center(
+      child: Switch.adaptive(
+          value: showChart,
+          onChanged: (value) {
+            setState(() {
+              showChart = value;
+            });
+          }),
+    );
+  }
+
+  Widget _buildPortraitContent(Widget txListWidget, AppBar appBar) {
+    return Column(
+      children: [
+        Container(
+            height: (MediaQuery.sizeOf(context).height -
+                    appBar.preferredSize.height -
+                    MediaQuery.paddingOf(context).top) *
+                0.3,
+            child: Chart(_userTransactions)),
+        txListWidget
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,15 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             islandScape && !Platform.isWindows
-                ? Center(
-                    child: Switch.adaptive(
-                        value: showChart,
-                        onChanged: (value) {
-                          setState(() {
-                            showChart = value;
-                          });
-                        }),
-                  )
+                ? _buildLandScapeContent()
                 : Row(),
             // ignore: sized_box_for_whitespace
             islandScape && !Platform.isWindows
@@ -176,17 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         : txListWidget
                     : txListWidget
                 : _userTransactions.isNotEmpty
-                    ? Column(
-                        children: [
-                          Container(
-                              height: (MediaQuery.sizeOf(context).height -
-                                      appBar.preferredSize.height -
-                                      MediaQuery.paddingOf(context).top) *
-                                  0.3,
-                              child: Chart(_userTransactions)),
-                          txListWidget
-                        ],
-                      )
+                    ? _buildPortraitContent(txListWidget, appBar)
                     : txListWidget,
           ],
         ),
